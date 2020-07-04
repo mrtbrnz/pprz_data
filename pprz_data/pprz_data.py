@@ -53,7 +53,7 @@ class DATA:
         
     def get_settings(self):
         ''' Special Message used for the fault injection settings
-        2 multiplicative, and 2 additive, and only appears when we cahnge them
+        2 multiplicative, and 2 additive, and only appears when we change them
         so the time between has to be filled in...'''
         msg_name = 'settings'; columns=['time','m1','m2','add1','add2'];drop_columns=['time']
         df = self.extract_message( msg_name, columns, drop_columns)
@@ -99,4 +99,9 @@ class DATA:
         return pd.concat(([self.df_All, df_settings]), axis=1, ignore_index=False, sort=False)
 
     def get_labelled_data(self):
-        return self.combine_settings_dataframe().ffill()
+        df = self.combine_settings_dataframe()
+        df.m1.iloc[0] = 1.0
+        df.m2.iloc[0] = 1.0
+        df.add1.iloc[0] = 0.0
+        df.add2.iloc[0] = 0.0
+        return df.ffill()
