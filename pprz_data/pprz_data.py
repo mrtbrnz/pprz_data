@@ -10,13 +10,15 @@ class DATA:
     """
     Data class from Paparazzi System.
     """
-    def __init__(self, filename=None, ac_id=None, data_type=None):
+    def __init__(self, filename=None, ac_id=None, data_type=None, pad=10, sample_period=0.01):
         self.df_list = []
         self.filename = filename
         self.ac_id = ac_id
         self.df = None
         self.data_values = 0.
         self.data_type = data_type
+        self.pad = pad
+        self.sample_period = sample_period
         if self.data_type=='fault':
             self.read_msg1_bundle()
         elif self.data_type=='flight':
@@ -76,11 +78,11 @@ class DATA:
             self.max_t = max(self.max_t, max(df.index))
         print('Min time :',self.min_t,'Maximum time :', self.max_t) # Minimum time can be deceiving... we may need to find a better way.
 
-    def linearize_time(self, df, min_t=None, max_t=None, pad=10, period=0.01):
+    def linearize_time(self, df, min_t=None, max_t=None):
         if (min_t or max_t) == None:
             min_t = min(df.index)
             max_t = max(df.index)
-        time = np.arange(int(min_t)+pad, int(max_t)-pad, period)
+        time = np.arange(int(min_t)+self.pad, int(max_t)-self.pad, self.sample_period)
         out = pd.DataFrame()
         out['time'] = time
         for col in df.columns:
