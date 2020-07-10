@@ -129,6 +129,20 @@ def read_log_actuators(ac_id, filename):
         if m:
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
     return np.array(list_meas)
+
+def read_log_commands(ac_id, filename):
+    """Extracts ACTUATOR values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" COMMANDS (\S+),(\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
+    return np.array(list_meas)
     
 def read_log_energy(ac_id, filename):
     """Extracts Energy sensor values from a log."""
@@ -214,6 +228,20 @@ def read_log_imugyro(ac_id, filename):
         m = re.match(pattern, line)
         if m:
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
+    return np.array(list_meas)
+
+def read_log_fault_telemetry(ac_id, filename):
+    """Extracts generic adc values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" FAULT_TELEMETRY (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2))])
     return np.array(list_meas)
 
 def read_log_mode(ac_id, filename):

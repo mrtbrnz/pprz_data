@@ -24,6 +24,7 @@ class DATA:
         elif self.data_type=='flight':
             self.read_msg1_bundle()
             self.read_msg2_bundle()
+            self.read_msg3_bundle()
         self.find_min_max()
         self.df_All = self.combine_dataframes()
         
@@ -45,13 +46,55 @@ class DATA:
             msg_name='gps';columns=['time','1','east','north','course','alt', 'vel', 'climb', '8','9','10','11'];drop_columns=['time','1','8','9','10','11']
             df = self.extract_message( msg_name, columns, drop_columns)
             df.alt = df.alt/1000.
+            df.vel = df.vel/100.     #convert to m/s
+            df.climb = df.climb/100. #convert to m/s
+            print(' Generating 3D velocity...')
+            df['vel_3d'] = df.climb.apply(lambda x: x**2)
+            df.vel_3d = df.vel_3d + df.vel.apply(lambda x: x**2)
+            df.vel_3d = df.vel_3d.apply(lambda x: np.sqrt(x))
+#             if 1:
+#                 # Calculate 3D speed (including the vertical component to the horizontal speed on ground.)
+#                 print(' Calculating the 3D speed norm !')
+#                 df['vel_3d1'] = df.climb.apply(lambda x: x**2)
+#                 print(df.vel_3d1.any())
             self.df_list.append(df)
         except: print(' GPS msg doesnt exist ')
         try:
             msg_name = 'imugyro';columns=['time','Gx','Gy','Gz']; drop_columns = ['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' IMU Gyro msg doesnt exist ')
-
+        try:
+            msg_name = 'fault_telemetry';columns=['time','Fault_Telemetry']; drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Fault Telemetry msg doesnt exist ')     
+              
+    def read_msg2_bundle(self):
+        try:
+            msg_name = 'actuators' ;columns=['time', 'S0','S1','S2'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Actuators msg doesnt exist ')
+        try:
+            msg_name = 'commands' ;columns=['time', 'C0','C1','C2'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Commands msg doesnt exist ')
+        try:
+            msg_name = 'energy_new' ;columns=['time', 'Throttle', 'Volt', 'Amp', 'Watt', 'mAh', 'Wh'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Energy_new msg doesnt exist ')            
+        try:
+            msg_name = 'air_data' ;columns=['time', 'Ps', 'Pdyn_AD', 'temp', 'qnh', 'amsl_baro', 'airspeed', 'TAS'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Air Data msg doesnt exist ')
+        try:
+            msg_name = 'desired'; columns=['time','D_roll','D_pitch','D_course','D_x', 'D_y', 'D_altitude','D_climb','D_airspeed']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Desired msg doesnt exist ') 
+            
+    def read_msg3_bundle(self):
+        try:
+            msg_name = 'gust' ; columns=['time','wx','wz', 'Va_gust', 'gamma_gust', ' AoA_gust', 'theta_com_gust']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Gust msg does not exist ')
         
     def get_settings(self):
         ''' Special Message used for the fault injection settings
