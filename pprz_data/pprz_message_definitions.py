@@ -271,3 +271,41 @@ def read_log_settings(ac_id, filename):
         if m:
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)),  float(m.group(5))])
     return np.array(list_meas)
+
+  # <message name="ROTORCRAFT_FP" id="147">
+  #   <field name="east"     type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="north"    type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="up"       type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="veast"    type="int32" alt_unit="m/s" alt_unit_coef="0.0000019"/>
+  #   <field name="vnorth"   type="int32" alt_unit="m/s" alt_unit_coef="0.0000019"/>
+  #   <field name="vup"      type="int32" alt_unit="m/s" alt_unit_coef="0.0000019"/>
+  #   <field name="phi"      type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="theta"    type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="psi"      type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="carrot_east"   type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="carrot_north"  type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="carrot_up"     type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="carrot_psi"    type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="thrust"        type="int32"/>
+  #   <field name="flight_time"   type="uint16" unit="s"/>
+  # </message>
+
+def read_log_rotorcraft_fp(ac_id, filename):
+    """Extracts rotorcraft_fp values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ROTORCRAFT_FP (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), 
+           float(m.group(7)), float(m.group(8)), float(m.group(9)), float(m.group(10)), float(m.group(11)),float(m.group(12)), 
+           float(m.group(13)), float(m.group(14)), float(m.group(15)),float(m.group(16)) ])
+    return np.array(list_meas)
+
+
+
+

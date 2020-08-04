@@ -67,7 +67,7 @@ class DATA:
             msg_name = 'fault_telemetry';columns=['time','Fault_Telemetry']; drop_columns = ['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' Fault Telemetry msg doesnt exist ')     
-              
+
     def read_msg2_bundle(self):
         try:
             msg_name = 'actuators' ;columns=['time', 'S0','S1','S2'] ;drop_columns = ['time']
@@ -95,6 +95,29 @@ class DATA:
             msg_name = 'gust' ; columns=['time','wx','wz', 'Va_gust', 'gamma_gust', ' AoA_gust', 'theta_com_gust']; drop_columns=['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' Gust msg does not exist ')
+  # <message name="ROTORCRAFT_FP" id="147">
+  #   <field name="east"     type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="north"    type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="up"       type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="veast"    type="int32" alt_unit="m/s" alt_unit_coef="0.0000019"/>
+  #   <field name="vnorth"   type="int32" alt_unit="m/s" alt_unit_coef="0.0000019"/>
+  #   <field name="vup"      type="int32" alt_unit="m/s" alt_unit_coef="0.0000019"/>
+  #   <field name="phi"      type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="theta"    type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="psi"      type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="carrot_east"   type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="carrot_north"  type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="carrot_up"     type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
+  #   <field name="carrot_psi"    type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
+  #   <field name="thrust"        type="int32"/>
+  #   <field name="flight_time"   type="uint16" unit="s"/>
+  # </message>
+        try:
+            msg_name = 'rotorcraft_fp' ; columns=['time','east','north', 'up', 'veast', 'vnorth', 'vup', 'phi', 'theta', 'psi', 'carrot_east', 
+                                                    'carrot_north', 'carrot_up', 'carrot_psi', 'thrust', 'flight_time']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Rotorcraft_fp msg does not exist ')
+
         
     def get_settings(self):
         ''' Special Message used for the fault injection settings
