@@ -43,6 +43,14 @@ class DATA:
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' IMU Acceleration msg doesnt exist ')
         try:
+            msg_name = 'imuaccel_scaled';columns=['time','Ax_sca','Ay_sca','Az_sca']; drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' IMU Scaled Acceleration msg doesnt exist ')
+        try:
+            msg_name = 'imuaccel_raw';columns=['time','Ax_raw','Ay_raw','Az_raw']; drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' IMU Raw Acceleration msg doesnt exist ')
+        try:
             msg_name='gps';columns=['time','1','east','north','course','alt', 'vel', 'climb', '8','9','10','11'];drop_columns=['time','1','8','9','10','11']
             df = self.extract_message( msg_name, columns, drop_columns)
             df.alt = df.alt/1000.
@@ -63,6 +71,14 @@ class DATA:
             msg_name = 'imugyro';columns=['time','Gx','Gy','Gz']; drop_columns = ['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' IMU Gyro msg doesnt exist ')
+        try:
+            msg_name = 'imugyro_scaled';columns=['time','Gx_sca','Gy_sca','Gz_sca']; drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' IMU Scaled Gyro msg doesnt exist ')
+        try:
+            msg_name = 'imugyro_raw';columns=['time','Gx_raw','Gy_raw','Gz_raw']; drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' IMU Raw Gyro msg doesnt exist ')
         try:
             msg_name = 'fault_telemetry';columns=['time','Fault_Telemetry']; drop_columns = ['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
@@ -95,6 +111,21 @@ class DATA:
             msg_name = 'gust' ; columns=['time','wx','wz', 'Va_gust', 'gamma_gust', ' AoA_gust', 'theta_com_gust']; drop_columns=['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' Gust msg does not exist ')
+        # <message name="SOARING_TELEMETRY" id="212">
+# <field name="velocity"     type="float"  unit="m/s">veocity</field>
+# <field name="a_attack"     type="float"  unit="rad">angle of attack</field>
+# <field name="a_sideslip"   type="float"  unit="rad">sideslip angle</field>
+# <field name="dynamic_p"    type="float"  unit="Pa"/>
+# <field name="static_p"     type="float"  unit="Pa"/>
+# <field name="wind_x"       type="float"  unit="m/s"/>
+# <field name="wind_z"       type="float"  unit="m/s"/>
+# <field name="wind_x_dot"   type="float"  unit="m/s2"/>
+# <field name="wind_z_dot"   type="float"  unit="m/s2"/>
+# <field name="wind_power"   type="float"  unit="W"/>
+        try:
+            msg_name = 'soaring_telemetry' ; columns=['time','sp_Va','sp_aoa','sp_beta','sp_dyn_p','sp_sta_p','sp_wx','sp_wz','sp_d_wx','sp_d_wz','sp_w_power']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Soaring Telemetry msg does not exist ')
   # <message name="ROTORCRAFT_FP" id="147">
   #   <field name="east"     type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>
   #   <field name="north"    type="int32" alt_unit="m" alt_unit_coef="0.0039063"/>

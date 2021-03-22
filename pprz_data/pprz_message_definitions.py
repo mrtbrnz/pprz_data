@@ -100,7 +100,22 @@ def read_log_gps(ac_id, filename):
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), 
            float(m.group(7)), float(m.group(8)), float(m.group(9)), float(m.group(10)), float(m.group(11)),float(m.group(12))])
     return np.array(list_meas)
-    
+
+def read_log_gps_int(ac_id, filename):
+    """Extracts gps values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" GPS_INT (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), 
+           float(m.group(7)), float(m.group(8)), float(m.group(9)), float(m.group(10)), float(m.group(11)),float(m.group(12)), float(m.group(13)),
+           float(m.group(14)), float(m.group(15)), float(m.group(16)),float(m.group(17)),float(m.group(18))])
+    return np.array(list_meas)    
     
 def read_log_attitude(ac_id, filename):
     """Extracts generic adc values from a log."""
@@ -216,10 +231,68 @@ def read_log_imuaccel(ac_id, filename):
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
     return np.array(list_meas)
 
+def read_log_imuaccel_scaled(ac_id, filename):
+    """Extracts generic adc values from a log."""
+    k = 0.0009766 # imu_accel_scaled coeff
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" IMU_ACCEL_SCALED (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2))*k, float(m.group(3))*k, float(m.group(4))*k])
+    return np.array(list_meas)
+
+def read_log_imuaccel_raw(ac_id, filename):
+    """Extracts generic adc values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" IMU_ACCEL_RAW (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
+    return np.array(list_meas)
+
 def read_log_imugyro(ac_id, filename):
     """Extracts generic adc values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_GYRO (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
+    return np.array(list_meas)
+
+def read_log_imugyro_scaled(ac_id, filename):
+    """Extracts generic adc values from a log."""
+    k = 0.0139882*0.017453292519943295 # imu_gyro_scaled coeff
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" IMU_GYRO_SCALED (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2))*k, float(m.group(3))*k, float(m.group(4))*k])
+    return np.array(list_meas)
+
+def read_log_imugyro_raw(ac_id, filename):
+    """Extracts generic adc values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" IMU_GYRO_RAW (\S+) (\S+) (\S+)")
     list_meas = []
     while True:
         line = f.readline().strip()
@@ -307,5 +380,28 @@ def read_log_rotorcraft_fp(ac_id, filename):
     return np.array(list_meas)
 
 
+# <message name="SOARING_TELEMETRY" id="212">
+# <field name="velocity"     type="float"  unit="m/s">veocity</field>
+# <field name="a_attack"     type="float"  unit="rad">angle of attack</field>
+# <field name="a_sideslip"   type="float"  unit="rad">sideslip angle</field>
+# <field name="dynamic_p"    type="float"  unit="Pa"/>
+# <field name="static_p"     type="float"  unit="Pa"/>
+# <field name="wind_x"       type="float"  unit="m/s"/>
+# <field name="wind_z"       type="float"  unit="m/s"/>
+# <field name="wind_x_dot"   type="float"  unit="m/s2"/>
+# <field name="wind_z_dot"   type="float"  unit="m/s2"/>
+# <field name="wind_power"   type="float"  unit="W"/>
 
-
+def read_log_soaring_telemetry(ac_id, filename):
+    """Extracts Air-data values from a log.  Ps, Pd, temp,qnh, amsl_baro, airspeed, TAS"""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" SOARING_TELEMETRY (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), float(m.group(7)), float(m.group(8)), float(m.group(9)), float(m.group(10)), float(m.group(11))])
+    return np.array(list_meas)
