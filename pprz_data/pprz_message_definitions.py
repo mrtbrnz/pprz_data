@@ -72,8 +72,22 @@ def read_log_desired(ac_id, filename):
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), float(m.group(7)), float(m.group(8)), float(m.group(9))])
     return np.array(list_meas)
 
+def read_log_adc_consumptions(ac_id, filename):
+    """Extracts generic float values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ADC_GENERIC (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3))])
+    return np.array(list_meas)
+
 def read_log_payload4(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts generic float values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" PAYLOAD_FLOAT (\S+),(\S+),(\S+),(\S+)")
     list_meas = []
@@ -85,7 +99,21 @@ def read_log_payload4(ac_id, filename):
         if m:
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5))])
     return np.array(list_meas)
-    
+
+def read_log_payload6(ac_id, filename):
+    """Extracts generic float values from a log. Here it is for hexacopter motor throttles..."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" PAYLOAD_FLOAT (\S+),(\S+),(\S+),(\S+),(\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), float(m.group(7))])
+    return np.array(list_meas)
+
 def read_log_gps(ac_id, filename):
     """Extracts gps values from a log."""
     f = open(filename, 'r')
@@ -118,7 +146,7 @@ def read_log_gps_int(ac_id, filename):
     return np.array(list_meas)    
     
 def read_log_attitude(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts attitude values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" ATTITUDE (\S+) (\S+) (\S+)")
     list_meas = []
@@ -204,7 +232,7 @@ def read_log_air_data(ac_id, filename):
 # wx wz Va gamma AoA Theta_commanded
 
 def read_log_gust(ac_id, filename):
-    """Extracts Energy sensor values from a log."""
+    """Extracts GUST telemetry values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" GUST (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)")
     list_meas = []
@@ -218,7 +246,7 @@ def read_log_gust(ac_id, filename):
     return np.array(list_meas) 
 
 def read_log_imuaccel(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts IMU accel values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_ACCEL (\S+) (\S+) (\S+)")
     list_meas = []
@@ -232,7 +260,7 @@ def read_log_imuaccel(ac_id, filename):
     return np.array(list_meas)
 
 def read_log_imuaccel_scaled(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts Scaled IMU accel values from a log."""
     k = 0.0009766 # imu_accel_scaled coeff
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_ACCEL_SCALED (\S+) (\S+) (\S+)")
@@ -247,7 +275,7 @@ def read_log_imuaccel_scaled(ac_id, filename):
     return np.array(list_meas)
 
 def read_log_imuaccel_raw(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts IMU accel raw values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_ACCEL_RAW (\S+) (\S+) (\S+)")
     list_meas = []
@@ -261,7 +289,7 @@ def read_log_imuaccel_raw(ac_id, filename):
     return np.array(list_meas)
 
 def read_log_imugyro(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts IMU gyro values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_GYRO (\S+) (\S+) (\S+)")
     list_meas = []
@@ -275,7 +303,7 @@ def read_log_imugyro(ac_id, filename):
     return np.array(list_meas)
 
 def read_log_imugyro_scaled(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts Scaled IMU gyro values from a log."""
     k = 0.0139882*0.017453292519943295 # imu_gyro_scaled coeff
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_GYRO_SCALED (\S+) (\S+) (\S+)")
@@ -290,7 +318,7 @@ def read_log_imugyro_scaled(ac_id, filename):
     return np.array(list_meas)
 
 def read_log_imugyro_raw(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts IMU gyro raw values from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" IMU_GYRO_RAW (\S+) (\S+) (\S+)")
     list_meas = []
@@ -304,7 +332,7 @@ def read_log_imugyro_raw(ac_id, filename):
     return np.array(list_meas)
 
 def read_log_fault_telemetry(ac_id, filename):
-    """Extracts generic adc values from a log."""
+    """Extracts Fault telemetry from a log."""
     f = open(filename, 'r')
     pattern = re.compile("(\S+) "+ac_id+" FAULT_TELEMETRY (\S+)")
     list_meas = []

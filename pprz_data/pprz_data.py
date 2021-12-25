@@ -25,6 +25,12 @@ class DATA:
             self.read_msg1_bundle()
             self.read_msg2_bundle()
             self.read_msg3_bundle()
+        elif self.data_type=='robust':
+            self.read_msg1_bundle()
+            self.read_msg2_bundle()
+            self.read_msg3_bundle()
+            self.read_msg4_bundle()
+
         self.find_min_max()
         self.df_All = self.combine_dataframes()
         
@@ -149,6 +155,16 @@ class DATA:
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' Rotorcraft_fp msg does not exist ')
 
+    def read_msg4_bundle(self):
+        try:
+            msg_name = 'payload6' ; columns=['time','M1','M2','M3','M4','M5','M6']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' PAYLOAD6 msg does not exist ')
+        try:
+            msg_name = 'adc_consumptions' ; columns=['time','Pow1','Pow2']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' ADC_CONSUMPTIONS msg does not exist ')
+
         
     def get_settings(self):
         ''' Special Message used for the fault injection settings
@@ -183,7 +199,7 @@ class DATA:
         out = pd.DataFrame()
         out['time'] = time
         for col in df.columns:
-            func = interp1d(df.index , df[col]) # FIXME : If we want to use a different method other than linear interpolation.
+            func = interp1d(df.index , df[col], fill_value='extrapolate') # FIXME : If we want to use a different method other than linear interpolation.
             out[col] = func(time)
         out.index = out.time
         out.drop(['time'], axis=1, inplace=True)
