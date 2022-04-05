@@ -1,5 +1,6 @@
 import re
 import numpy as np
+import pandas as pd
 
 def read_log_dyn_press(ac_id, filename):
     """Extracts generic adc values from a log."""
@@ -13,6 +14,99 @@ def read_log_dyn_press(ac_id, filename):
         m = re.match(pattern, line)
         if m:
            list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4))])
+    return np.array(list_meas)
+
+def read_log_dshot_telemetry(ac_id, filename):
+    """Extracts dshot telemetry motor rpm values from a log.
+       Be CAREFUL returns a df list instead of single df !!! """
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ESC (\S+) (\S+) (\S+) (\S+) (\S+) (\S+) (\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), 
+           float(m.group(7)), float(m.group(8))])
+    data = np.array(list_meas)
+
+    motor_df_list = []
+    motor_list = [8,1,2,4,5,6]
+    for i in motor_list:
+        index = np.where(data[:,7] == i)
+        # pdb.set_trace()
+        t = data[index][:,0]
+        rpm = data[index][:,4]
+        M_df = pd.DataFrame(np.vstack((t,rpm)).T, columns=['time', f'M{i}_rpm'])
+        M_df.index = M_df.time
+        M_df.drop(['time'], axis=1, inplace=True)
+        motor_df_list.append(M_df)
+    return motor_df_list
+
+def read_log_rotorcraft_fault(ac_id, filename):
+    """Extracts generic float values from a log. Here it is for hexacopter motor throttles..."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ROTORCRAFT_FAULT (\S+),(\S+),(\S+),(\S+),(\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6)), float(m.group(7))])
+    return np.array(list_meas)
+
+def read_log_robust_morph_angle(ac_id, filename):
+    """Extracts generic float values from a log. Here it is for hexacopter motor throttles..."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" MORPH_ANGLE (\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3))])
+    return np.array(list_meas)
+
+def read_log_actuators_8(ac_id, filename):
+    """Extracts ACTUATOR values from a log."""
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ACTUATORS (\S+),(\S+),(\S+),(\S+),(\S+),(\S+),(\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+           list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)),float(m.group(5)), float(m.group(6)), float(m.group(7)), float(m.group(8)), float(m.group(9))])
+    return np.array(list_meas)
+
+def read_log_actuators_6(ac_id, filename):
+    """Extracts ACTUATOR values from a log."""
+    def count_char(string,char=","):
+        count = 0
+        for i in range(0, len(string)):
+            if string[i] == char:
+                count += 1
+        return count
+
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ACTUATORS (\S+),(\S+),(\S+),(\S+),(\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+            if count_char(line) < 6:
+                list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)),float(m.group(5)), float(m.group(6)), float(m.group(7))])
     return np.array(list_meas)
 
 def read_log_SDP3X(ac_id, filename):

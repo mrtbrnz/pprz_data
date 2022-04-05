@@ -6,6 +6,8 @@ import pandas as pd
 from scipy.interpolate import griddata, interp1d
 from pprz_data import pprz_message_definitions as msg
 
+import pdb
+
 class DATA:
     """
     Data class from Paparazzi System.
@@ -30,6 +32,8 @@ class DATA:
             self.read_msg2_bundle()
             self.read_msg3_bundle()
             self.read_msg4_bundle()
+        elif self.data_type=='replay':
+            self.read_replay_msg_bundle()
 
         self.find_min_max()
         self.df_All = self.combine_dataframes()
@@ -157,14 +161,46 @@ class DATA:
 
     def read_msg4_bundle(self):
         try:
+            '''This one is a bit hardcoded !!! Sorry ! '''
+            motor_df_list = msg.read_log_dshot_telemetry(self.ac_id, self.filename)
+            for df in motor_df_list:
+                self.df_list.append(df)
+        except: print(' DSHOT TELEMETRY msg does not exist ')
+        try:
             msg_name = 'payload6' ; columns=['time','M1','M2','M3','M4','M5','M6']; drop_columns=['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' PAYLOAD6 msg does not exist ')
         try:
+            msg_name = 'actuators_6' ;columns=['time','M1_pprz','M2_pprz','M3_pprz','M4_pprz','M5_pprz','M6_pprz'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' 6-valued Actuators msg doesnt exist ')
+        try:
+            msg_name = 'actuators_8' ;columns=['time','S1','S2','M1','M2','M3','M4','M5','M6'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' 8-valued Actuators msg doesnt exist ')
+        try:
+            msg_name = 'rotorcraft_fault' ; columns=['time','M1F','M2F','M3F','M4F','M5F','M6F']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' ROTORCRAFT FAULT msg does not exist (hexa-version)')
+        try:
             msg_name = 'adc_consumptions' ; columns=['time','Pow1','Pow2']; drop_columns=['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' ADC_CONSUMPTIONS msg does not exist ')
+        try:
+            msg_name = 'robust_morph_angle' ; columns=['time','Morph1','Morph2']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' MORPH_ANGLE msg does not exist (This is for RoBust-Morphing-Hexa)')
 
+    def read_replay_msg_bundle(self):
+        try:
+            msg_name = 'rotorcraft_fp' ; columns=['time','east','north', 'up', 'veast', 'vnorth', 'vup', 'phi', 'theta', 'psi', 'carrot_east', 
+                                                    'carrot_north', 'carrot_up', 'carrot_psi', 'thrust', 'flight_time']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' Rotorcraft_fp msg does not exist ')
+        try:
+            msg_name = 'robust_morph_angle' ; columns=['time','Morph1','Morph2']; drop_columns=['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: pr
         
     def get_settings(self):
         ''' Special Message used for the fault injection settings
