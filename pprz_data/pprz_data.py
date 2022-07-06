@@ -115,7 +115,11 @@ class DATA:
             msg_name = 'desired'; columns=['time','D_roll','D_pitch','D_course','D_x', 'D_y', 'D_altitude','D_climb','D_airspeed']; drop_columns=['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' Desired msg doesnt exist ') 
-            
+        try:
+            msg_name = 'actuators_4' ;columns=['time','M1_pprz','M2_pprz','M3_pprz','M4_pprz'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' 4-valued Actuators msg doesnt exist ')
+
     def read_msg3_bundle(self):
         try:
             msg_name = 'gust' ; columns=['time','wx','wz', 'Va_gust', 'gamma_gust', ' AoA_gust', 'theta_com_gust']; drop_columns=['time']
@@ -170,6 +174,10 @@ class DATA:
             msg_name = 'payload6' ; columns=['time','M1','M2','M3','M4','M5','M6']; drop_columns=['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
         except: print(' PAYLOAD6 msg does not exist ')
+        try:
+            msg_name = 'actuators_4' ;columns=['time','M1_pprz','M2_pprz','M3_pprz','M4_pprz'] ;drop_columns = ['time']
+            self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )
+        except: print(' 4-valued Actuators msg doesnt exist ')
         try:
             msg_name = 'actuators_6' ;columns=['time','M1_pprz','M2_pprz','M3_pprz','M4_pprz','M5_pprz','M6_pprz'] ;drop_columns = ['time']
             self.df_list.append( self.extract_message( msg_name, columns, drop_columns) )

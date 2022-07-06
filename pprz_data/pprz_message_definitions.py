@@ -33,13 +33,14 @@ def read_log_dshot_telemetry(ac_id, filename):
     data = np.array(list_meas)
 
     motor_df_list = []
-    motor_list = [8,1,2,4,5,6]
+    motor_list = [1,2,3,4]
     for i in motor_list:
         index = np.where(data[:,7] == i)
         # pdb.set_trace()
         t = data[index][:,0]
         rpm = data[index][:,4]
-        M_df = pd.DataFrame(np.vstack((t,rpm)).T, columns=['time', f'M{i}_rpm'])
+        amp = data[index][:,5]
+        M_df = pd.DataFrame(np.vstack((t,rpm,amp)).T, columns=['time', f'M{i}_rpm', f'M{i}_amp'])
         M_df.index = M_df.time
         M_df.drop(['time'], axis=1, inplace=True)
         motor_df_list.append(M_df)
@@ -106,6 +107,28 @@ def read_log_actuators_6(ac_id, filename):
         m = re.match(pattern, line)
         if m:
             if count_char(line) < 6:
+                list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)),float(m.group(5)), float(m.group(6)), float(m.group(7))])
+    return np.array(list_meas)
+
+def read_log_actuators_4(ac_id, filename):
+    """Extracts ACTUATOR values from a log."""
+    def count_char(string,char=","):
+        count = 0
+        for i in range(0, len(string)):
+            if string[i] == char:
+                count += 1
+        return count
+
+    f = open(filename, 'r')
+    pattern = re.compile("(\S+) "+ac_id+" ACTUATORS (\S+),(\S+),(\S+),(\S+),(\S+),(\S+)")
+    list_meas = []
+    while True:
+        line = f.readline().strip()
+        if line == '':
+            break
+        m = re.match(pattern, line)
+        if m:
+            if count_char(line) < 4:
                 list_meas.append([float(m.group(1)), float(m.group(2)), float(m.group(3)), float(m.group(4)),float(m.group(5)), float(m.group(6)), float(m.group(7))])
     return np.array(list_meas)
 
