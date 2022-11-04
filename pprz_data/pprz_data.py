@@ -254,8 +254,17 @@ class DATA:
         return pd.concat(frames, axis=1, ignore_index=False, sort=False)
 
     def combine_settings_dataframe(self):
-        df_settings = self.get_settings() #FIXME : we may check if this has been already done before or not...
-        return pd.concat(([self.df_All, df_settings]), axis=1, ignore_index=False, sort=False)
+        df_settings = self.get_settings()
+        df = self.df_All.copy()
+        df["m1"] = np.NaN ; df["m2"] = np.NaN ; df["add1"] = np.NaN ; df["add2"] = np.NaN
+        # Starting time
+        i_st=df.index[0]
+        for i in range(len(df_settings.index)):
+            df.m1.iloc[int(round(df_settings.index[i]-i_st,1)/self.sample_period)] = df_settings.m1.iloc[i]
+            df.m2.iloc[int(round(df_settings.index[i]-i_st,1)/self.sample_period)] = df_settings.m2.iloc[i]
+            df.add1.iloc[int(round(df_settings.index[i]-i_st,1)/self.sample_period)] = df_settings.add1.iloc[i]
+            df.add2.iloc[int(round(df_settings.index[i]-i_st,1)/self.sample_period)] = df_settings.add2.iloc[i]
+        return df
 
     def get_labelled_data(self):
         df = self.combine_settings_dataframe()
@@ -264,3 +273,15 @@ class DATA:
         df.add1.iloc[0] = 0.0
         df.add2.iloc[0] = 0.0
         return df.ffill()
+
+    # def combine_settings_dataframe(self):
+    #     df_settings = self.get_settings() #FIXME : we may check if this has been already done before or not...
+    #     return pd.concat(([self.df_All, df_settings]), axis=1, ignore_index=False, sort=False)
+
+    # def get_labelled_data(self):
+    #     df = self.combine_settings_dataframe()
+    #     df.m1.iloc[0] = 1.0
+    #     df.m2.iloc[0] = 1.0
+    #     df.add1.iloc[0] = 0.0
+    #     df.add2.iloc[0] = 0.0
+    #     return df.ffill()
